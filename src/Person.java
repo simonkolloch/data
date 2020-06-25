@@ -19,51 +19,38 @@ public class Person {
         this.geschlecht=pGeschlecht;
     }
 
-    public int kaufeProdukt(Produkt pProdukt){
-        if(gekaufteProdukte.contains(pProdukt)){
-            //System.out.println("Produkt wurde bereits gekauft");
-            return DOPPELT;
-        }
-        else{
-            //System.out.println(this.getName()+"hat "+pProdukt.getName()+" gekauft");
+    public void kaufeProdukt(Produkt pProdukt){
+        if(!gekaufteProdukte.contains(pProdukt)){
             gekaufteProdukte.add(pProdukt);
-            return OK;
         }
     }
 
-    public int schliesseFreundschaft(Person pPerson){
-        if(freunde.contains(pPerson)){
+    public void schliesseFreundschaft(Person pPerson){
+        if(!freunde.contains(pPerson)){
            // System.out.println(this.getName()+" und "+pPerson.getName()+" sind bereits befreundet");
-            return DOPPELT;
-        }
-        else{
-            //System.out.println(this.getName()+" und " +pPerson.getName()+" sind jetzt Freunde");
             freunde.add(pPerson);
-            return OK;
         }
     }
 
-    public int produktNetzwerk(){
+    public ArrayList <String> produktNetzwerk() {
         ArrayList<Produkt> produkte;
-        produkte=netzwerk();
-        if(produkte.size()!=0){
-            for(int i =0; i<=produkte.size()-1;i++){
-                System.out.print(produkte.get(i).getName());
-                if(i!=produkte.size()-1){
-                    System.out.print(", ");
-                }
+        ArrayList<String>ergebnis = new ArrayList<>();
+        produkte = netzwerk();
+        if (produkte.size() != 0) {
+            for(Produkt p: produkte){
+                ergebnis.add("ID: "+p.getiD()+", Name: "+p.getName()+", Firma: "+p.getFirma().getName());
             }
-            return OK;
         }
-        else{
-            System.out.println("Keine Produkte im Produktnetzwerk");
-            return KEIN_OBJEKT_GEFUNDEN;
+        else {
+            ergebnis.add("Keine Produkte im Produktnetzwerk!");
         }
+        return ergebnis;
     }
 
-    public int firmenNetzwerk(){
+    public ArrayList<String> firmenNetzwerk(){
         ArrayList<Produkt> produkte;
         ArrayList<Firma> firmen = new ArrayList<Firma>();
+        ArrayList<String>ergebnis = new ArrayList<>();
         produkte=netzwerk();
         for(Produkt x: produkte){
                 if(!firmen.contains(x.getFirma())){
@@ -77,18 +64,14 @@ public class Person {
             }
         });
         if(firmen.size()!=0){
-            for(int i=0;i<=firmen.size()-1;i++){
-                System.out.print(firmen.get(i).getName());
-                if(i!=firmen.size()-1){
-                    System.out.print(", ");
-                }
+            for(Firma p :firmen){
+                ergebnis.add("ID: "+p.getId()+", Name: "+p.getName());
             }
-            return OK;
         }
-        else{
-            System.out.println("Keine Firmen im Firmennetzwerk");
-            return KEIN_OBJEKT_GEFUNDEN;
+        else {
+            ergebnis.add("Keine Firmen im Firmennetzwerk!");
         }
+        return ergebnis;
     }
 
     private ArrayList<Produkt> netzwerk(){
@@ -110,18 +93,13 @@ public class Person {
         return produkte;
     }
 
-    public int checkFreundschaft(){
-        int ergebniss=KEINE_FREUNDSCHAFT;
+    public void checkFreundschaft(){
         for(Person p:this.freunde){
-            if(p.freunde.contains(this)){
-                ergebniss=OK;
-            }
-            else{
+            if(!p.freunde.contains(this)){
                 System.out.println("FAKE FREUNDE GEFUNDEN");
                 this.freunde.remove(p);
             }
         }
-        return ergebniss;
     }
 
     public String getName() {

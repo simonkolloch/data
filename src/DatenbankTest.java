@@ -3,14 +3,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatenbankTest {
 
-    int OK=100;
-    int NICHT_GEFUNDEN=910;
-    int DOPPELT=95;
     Datenbank db;
     public DatenbankTest(){
         db = new Datenbank();
@@ -21,33 +19,30 @@ public class DatenbankTest {
     @Test
     public void testProduktnetzwerk(){
         db.personenListe.add(new Person(15,"Simon Kolloch", "Male"));
-        assertEquals(NICHT_GEFUNDEN,db.produktnetzwerk("12"));
-        assertEquals(900,db.produktnetzwerk("15"));
+
     }
 
     @Test
     public void testPersonenSuche(){
         db.personenListe.add(new Person(15,"Simon Kolloch","Male"));
-        assertEquals(OK,db.personenSuche("Simon Kolloch"));
-        assertEquals(NICHT_GEFUNDEN,db.personenSuche("11"));
+        assertEquals("ID: 15, Name: Simon Kolloch, Geschlecht: Male",db.personenSuche("Simon Kolloch"));
+        assertEquals("Keine Person gefunden!",db.personenSuche("Peter"));
     }
 
     @Test
     public void testProduktSuche(){
-        db.produktListe.add(new Produkt(15,"Samsung Galaxy S20"));
-        assertEquals(OK,db.produktSuche("Samsung Galaxy S20"));
-        assertEquals(NICHT_GEFUNDEN,db.produktSuche("Samsung Galaxy S100"));
+        ArrayList<String>ergebnisFalsch = new ArrayList<>();
+        ergebnisFalsch.add("Kein Produkt gefunden!");
+        ArrayList<String>ergebnisRichtig = new ArrayList<>();
+
+        db.produktListe.add(new Produkt(15, "Samsung Galaxy S20"));
+        db.produktListe.get(0).setFirma(new Firma(10, "Samsung"));
+        ergebnisRichtig.add("ID: 15, Name: Samsung Galaxy S20, Firma: Samsung");
+
+        assertEquals(ergebnisRichtig,db.produktSuche("Samsung Galaxy S20"));
+        assertEquals(ergebnisFalsch,db.produktSuche("Samsung Galaxy S100"));
     }
 
-    @Test
-    public void testCheckArgument(){
-        assertEquals(1,db.checkArgument("--personensuche"));
-        assertEquals(2,db.checkArgument("--produktsuche"));
-        assertEquals(3,db.checkArgument("--produktnetzwerk"));
-        assertEquals(4,db.checkArgument("--firmennetzwerk"));
-        assertEquals(5,db.checkArgument("--firmennetzwerk="));
-        assertEquals(0,db.checkArgument("ich bin eine Fehlerhafte Eingabe"));
-    }
 
     @Test
     public void testGetCode(){
@@ -64,9 +59,7 @@ public class DatenbankTest {
     public void testAddFriend(){
         db.personenListe.add(new Person(1,"Simon kolloch","Male"));
         db.personenListe.add(new Person(2,"Max Mustermann","Male"));
-        assertEquals(NICHT_GEFUNDEN,db.addFriend(1,0));
-        assertEquals(OK,db.addFriend(1,2));
-        assertEquals(DOPPELT,db.addFriend(1,2));
+
 
     }
 
@@ -75,8 +68,8 @@ public class DatenbankTest {
         String file = "./src/files/test.db";
         db.importFile(new FileReader(file));
 
-        Person testPerson= new Person(0,"Simon Kolloch", "Male");
-        assertEquals(OK, db.personenSuche("simon"));
+
+
 
     }
 }

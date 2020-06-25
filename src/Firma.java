@@ -12,17 +12,11 @@ public class Firma {
         this.name=pName;
     }
 
-    public int stelleHer(Produkt pProdukt){
-        if(produkte.contains(pProdukt)){
-            //System.out.println("Produkt wird bereits hergestellt");
-            return DOPPELT;
-        }
-        else{
-            //System.out.println(this.getName()+" stellt "+pProdukt.getName()+" her");
+    public void stelleHer(Produkt pProdukt){
+        if(!produkte.contains(pProdukt)){
             produkte.add(pProdukt);
-            return OK;
-        }
 
+        }
     }
 
     public int getId() {

@@ -2,8 +2,8 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class Datenbank {
-    private static final int PERSONCODE = 10, PRODUCTCODE = 20, COMPANYCODE = 30, FRIENDSCODE = 40, BELONGSCODE = 50, PRODUCERCODE = 60,KEINE_FREUNDSCHAFT=97,
-                             NEW_ENTITY_ERROR=99, SYNTAX_ERROR=98, OK=100, KEIN_OBJEKT_GEFUNDEN=900, KEINE_PERSON_GEFUNDEN=910, KEIN_PRODUKT_GEFUNDEN=910, EXISTIERT=1, EXISTIERT_NICHT=0, DOPPELT=95;
+    private static final int PERSONCODE = 10, PRODUCTCODE = 20, COMPANYCODE = 30, FRIENDSCODE = 40, BELONGSCODE = 50, PRODUCERCODE = 60,
+                             NEW_ENTITY_ERROR=99, SYNTAX_ERROR=98,EXISTIERT=1, EXISTIERT_NICHT=0;
     public static ArrayList<Person> personenListe = new ArrayList<Person>();
     public static ArrayList<Firma> firmenListe = new ArrayList<Firma>();
     public static ArrayList<Produkt> produktListe = new ArrayList<Produkt>();
@@ -15,7 +15,7 @@ public class Datenbank {
         checkArgument(args[0]);
     }
 
-    public static int checkArgument(String arg) {
+    public static void checkArgument(String arg) {
         int ergebniss=0;
         String parameter;
         String auswahl;
@@ -27,17 +27,19 @@ public class Datenbank {
         }
         switch (auswahl) {
             case "personensuche":
-                personenSuche(parameter);
-                ergebniss=1;
+                System.out.println("Suche nach " + parameter + " ergab folgendes Ergebnis:");
+                ausgabe(personenSuche(parameter));
                 break;
             case "produktsuche":
-                produktSuche(parameter);
-                ergebniss= 2;
+                System.out.println("Suche nach " + parameter + " ergab folgendes Ergebnis:");
+                ausgabe(produktSuche(parameter));
+
                 break;
             case "produktnetzwerk":
-                produktnetzwerk(parameter);
-                ergebniss= 3;
+                System.out.println("Suche nach Produktnetzwerk von " + parameter + " ergab folgendes Ergebnis:");
+                ausgabe(produktnetzwerk(parameter));
                 break;
+
             case "firmennetzwerk":
                 firmennetzwerk(parameter);
                 ergebniss= 4;
@@ -49,70 +51,81 @@ public class Datenbank {
                 System.out.println("Eingegebes Argument Fehlerhaft! Mögliche Argumente:\n\b--personensuche='[name]'\n\b--produktsuche='[produktname]'\n\b--produktnetzwerk='[personen_id]'\n\b--firmennetzwerk='[personen_id]'\n");
                 break;
         }
-        return ergebniss;
+
+    }
+
+    private static void ausgabe(ArrayList<String> pListe){
+        int i = 0;
+        for(String s: pListe){
+            if(i!= pListe.size()-1){
+                System.out.println(s+",");
+                i++;
+            }
+            else{
+                System.out.println(s);
+            }
+        }
     }
 
 
-    public static int personenSuche(String suche) {
-        int ergebniss= KEINE_PERSON_GEFUNDEN;
-        System.out.println("Suche nach \"" + suche + "\" ergab folgendes Ergebnis:");
+    public static ArrayList<String> personenSuche(String suche) {
+        ArrayList<String>ergebniss= new ArrayList<>();
         for (Person p : personenListe) {
             if (p.getName().toLowerCase().contains(suche.toLowerCase())) {
-                System.out.println("ID: " + p.getiD() + ", Name: " + p.getName() + ", Geschlecht: " + p.getGeschlecht());
-                ergebniss=OK;
+                ergebniss.add("ID: " + p.getiD() + ", Name: " + p.getName() + ", Geschlecht: " + p.getGeschlecht());
             }
         }
-        if (ergebniss==KEINE_PERSON_GEFUNDEN) {
-            System.out.println("Keine Person mit dem Namen: " + suche + " gefunden");
+        if(ergebniss.isEmpty()){
+            ergebniss.add("Keine Person gefunden!");
         }
         return ergebniss;
     }
 
-    public static int produktSuche(String suche) {
-        int ergebniss= KEIN_PRODUKT_GEFUNDEN;
-        System.out.println("Suche nach " + suche + " ergab folgendes Ergebnis:");
+    public static ArrayList<String> produktSuche(String suche) {
+        ArrayList<String>ergebniss = new ArrayList<>();
         for (Produkt p : produktListe) {
             if (p.getName().toLowerCase().contains(suche.toLowerCase())) {
-                System.out.println("ID: " + p.getiD() + ", Name: " + p.getName()+ ", Firma: " +p.getFirma().getName());
-                ergebniss=OK;
+                ergebniss.add("ID: " + p.getiD() + ", Name: " + p.getName()+ ", Firma: " +p.getFirma().getName());
             }
         }
-        if (ergebniss==KEIN_PRODUKT_GEFUNDEN) {
-            System.out.println("Kein Produkt mit dem Namen: " + suche + " gefunden");
+        if(ergebniss.isEmpty()){
+            ergebniss.add("Kein Produkt gefunden!");
         }
         return ergebniss;
     }
 
-    public static int produktnetzwerk(String suche){
-        int ergebniss= KEINE_PERSON_GEFUNDEN;
+
+
+    public static ArrayList <String> produktnetzwerk(String suche){
+        ArrayList <String> ergebnis = new ArrayList<>();
         System.out.println("Suche nach Produktnetzwerk von " + suche + " ergab folgendes Ergebnis:");
         if(existPerson(Integer.parseInt(suche))==1) {
             for (Person x : personenListe) {
                 if (x.getiD() == Integer.parseInt(suche)) {
-                    ergebniss = x.produktNetzwerk();
+                    ergebnis = x.produktNetzwerk();
                 }
             }
         }
         else{
-            System.out.println("Die Person wurde nicht gefunden!");
+            ergebnis.add("Die gesuchte Person existiert nicht!");
         }
-        return ergebniss;
+        return ergebnis;
     }
 
-    public static int firmennetzwerk(String suche){
-        int ergebniss= KEINE_PERSON_GEFUNDEN;
+    public static ArrayList<String> firmennetzwerk(String suche){
+       ArrayList<String>ergebnis = new ArrayList<>();
         System.out.println("Suche nach Firmennetzwerk von " + suche + " ergab folgendes Ergebnis:");
         if(existPerson(Integer.parseInt(suche))==1) {
             for (Person x : personenListe) {
                 if (x.getiD() == Integer.parseInt(suche)) {
-                    ergebniss=x.firmenNetzwerk();
+                    ergebnis=x.firmenNetzwerk();
                 }
             }
         }
         else{
-            System.out.println("Die Person wurde nicht gefunden!");
+            ergebnis.add("Die gesuchte Person existiert nicht!");
         }
-        return ergebniss;
+        return ergebnis;
     }
 
     public static void importFile(FileReader file) {
@@ -213,16 +226,14 @@ public class Datenbank {
            Firmen in die firmenliste
            und Produkte in die Produktliste
         */
-    public static int addToList(ArrayList list, Object p) {
+    public static void addToList(ArrayList list, Object p) {
         if (!list.contains(p)) {
             list.add(p);
-            return OK;
         }
-        else return DOPPELT;
     }
 
 
-    public static int addFriend(int friend1, int friend2) {
+    public static void addFriend(int friend1, int friend2) {
         int ergebniss=EXISTIERT_NICHT;
         int index=0;
         if(existPerson(friend1)==1&&existPerson(friend2)==1) {
@@ -233,20 +244,15 @@ public class Datenbank {
             }
             for (Person i : personenListe) {
                 if (i.getiD() == friend1) {
-                       ergebniss=i.schliesseFreundschaft(personenListe.get(index));
+                       i.schliesseFreundschaft(personenListe.get(index));
                 }
             }
-            return ergebniss;
-        }
-        else{
-            return KEINE_PERSON_GEFUNDEN;
         }
     }
 
 
-    public static int addProdukt(int person, int produkt) {
+    public static void addProdukt(int person, int produkt) {
         int index=0;
-        int ergebniss=EXISTIERT_NICHT;
         if(existPerson(person)==EXISTIERT&&existProdukt(produkt)==EXISTIERT) {
             for (Produkt p : produktListe) {
                 if (p.getiD() == produkt) {
@@ -255,16 +261,14 @@ public class Datenbank {
             }
             for (Person i : personenListe) {
                 if (i.getiD() == person) {
-                    ergebniss=i.kaufeProdukt(produktListe.get(index));
+                    i.kaufeProdukt(produktListe.get(index));
                 }
             }
         }
-        return ergebniss;
     }
 
 
-    public static int addProduktion(int produkt, int firma) {
-        int ergebniss=EXISTIERT_NICHT;
+    public static void addProduktion(int produkt, int firma) {
         int index=0;
         if(existProdukt(produkt)==EXISTIERT&&existFirma(firma)==EXISTIERT) {
             for (Produkt p : produktListe) {
@@ -274,23 +278,20 @@ public class Datenbank {
             }
             for (Firma i : firmenListe) {
                 if (i.getId() == firma) {
-                    ergebniss=i.stelleHer(produktListe.get(index));
+                    i.stelleHer(produktListe.get(index));
                     produktListe.get(index).setFirma(i);
                 }
             }
         }
-        return ergebniss;
     }
     /*
     Diese Methode iteriert durch alle Freundeslisten, der Personen die angelegt worden sind.
 
      */
-    public static int checkFreundschaft(){
-        int ergebniss=KEINE_FREUNDSCHAFT;
+    public static void checkFreundschaft(){
         for(Person p: personenListe){
-            ergebniss=p.checkFreundschaft();
+            p.checkFreundschaft();
         }
-        return ergebniss;
     }
     /*
     Die Folgenden drei Methoden ueberpruefen, ob eine Person, Firma oder Produkt existiert.
