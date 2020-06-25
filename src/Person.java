@@ -4,14 +4,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 
 public class Person {
-    private int OK=100;
-    private int DOPPELT=95;
-    private static int KEIN_OBJEKT_GEFUNDEN=900;
-    private int KEINE_FREUNDSCHAFT=97;
-    public int iD;
-    public String name,geschlecht;
-    public ArrayList<Person> freunde = new ArrayList<Person>();
-    public ArrayList<Produkt> gekaufteProdukte = new ArrayList<Produkt>();
+    private int iD;
+    private String name,geschlecht;
+    private ArrayList<Person> freunde = new ArrayList<Person>();
+    private ArrayList<Produkt> gekaufteProdukte = new ArrayList<Produkt>();
 
     public Person(int pID, String pName, String pGeschlecht){
         this.iD=pID;
@@ -31,6 +27,13 @@ public class Person {
             freunde.add(pPerson);
         }
     }
+
+    public ArrayList<Person> getFreunde() {
+        return freunde;
+    }
+
+
+
 
     public ArrayList <String> produktNetzwerk() {
         ArrayList<Produkt> produkte;

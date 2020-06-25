@@ -7,16 +7,8 @@ public class Datenbank {
     public static ArrayList<Person> personenListe = new ArrayList<Person>();
     public static ArrayList<Firma> firmenListe = new ArrayList<Firma>();
     public static ArrayList<Produkt> produktListe = new ArrayList<Produkt>();
-    private static String FILE="./src/files/movieproject2020.db";
 
-    public static void main(String[] args) throws FileNotFoundException {
-        importFile(new FileReader(FILE));
-        checkFreundschaft();
-        checkArgument(args[0]);
-    }
-
-    public static void checkArgument(String arg) {
-        int ergebniss=0;
+    public  void checkArgument(String arg) {
         String parameter;
         String auswahl;
         parameter = arg.substring(arg.indexOf("=") + 1);
@@ -33,32 +25,28 @@ public class Datenbank {
             case "produktsuche":
                 System.out.println("Suche nach " + parameter + " ergab folgendes Ergebnis:");
                 ausgabe(produktSuche(parameter));
-
                 break;
             case "produktnetzwerk":
                 System.out.println("Suche nach Produktnetzwerk von " + parameter + " ergab folgendes Ergebnis:");
                 ausgabe(produktnetzwerk(parameter));
                 break;
-
             case "firmennetzwerk":
                 firmennetzwerk(parameter);
-                ergebniss= 4;
+                ausgabe(firmennetzwerk(parameter));
                 break;
             case "kein Parameter":
                 System.out.println("Bitte übergebe auch ein Parameter!");
-                ergebniss=5;
             default:
-                System.out.println("Eingegebes Argument Fehlerhaft! Mögliche Argumente:\n\b--personensuche='[name]'\n\b--produktsuche='[produktname]'\n\b--produktnetzwerk='[personen_id]'\n\b--firmennetzwerk='[personen_id]'\n");
+                System.out.println("Eingegebes Argument Fehlerhaft! Mögliche Argumente:\n\b--personensuche=\"[name]\"\n\b--produktsuche=\"[produktname]\"\n\b--produktnetzwerk=\"[personen_id]\"\n\b--firmennetzwerk=\"[personen_id]\"\n");
                 break;
         }
-
     }
 
-    private static void ausgabe(ArrayList<String> pListe){
+    public void ausgabe(ArrayList<String> pListe){
         int i = 0;
         for(String s: pListe){
             if(i!= pListe.size()-1){
-                System.out.println(s+",");
+                System.out.println(s+";");
                 i++;
             }
             else{
@@ -67,12 +55,26 @@ public class Datenbank {
         }
     }
 
-
-    public static ArrayList<String> personenSuche(String suche) {
+    public ArrayList<String> personenSuche(String suche) {
+        String produkte="";
         ArrayList<String>ergebniss= new ArrayList<>();
         for (Person p : personenListe) {
             if (p.getName().toLowerCase().contains(suche.toLowerCase())) {
-                ergebniss.add("ID: " + p.getiD() + ", Name: " + p.getName() + ", Geschlecht: " + p.getGeschlecht());
+                if(p.getGekaufteProdukte().isEmpty()){
+                    produkte=" besitzt keine produkte";
+                }
+                else{
+                    int j=0;
+                    for(Produkt i:p.getGekaufteProdukte()){
+                        produkte+=i.getName();
+                        if(j!=p.getGekaufteProdukte().size()-1){
+                            produkte+=", ";
+                        }
+                        j++;
+                    }
+                }
+                ergebniss.add("ID: " + p.getiD() + ", Name: " + p.getName() + ", Geschlecht: " + p.getGeschlecht()+", Produkte: "+produkte);
+                produkte="";
             }
         }
         if(ergebniss.isEmpty()){
@@ -81,7 +83,7 @@ public class Datenbank {
         return ergebniss;
     }
 
-    public static ArrayList<String> produktSuche(String suche) {
+    public ArrayList<String> produktSuche(String suche) {
         ArrayList<String>ergebniss = new ArrayList<>();
         for (Produkt p : produktListe) {
             if (p.getName().toLowerCase().contains(suche.toLowerCase())) {
@@ -95,8 +97,7 @@ public class Datenbank {
     }
 
 
-
-    public static ArrayList <String> produktnetzwerk(String suche){
+    public ArrayList <String> produktnetzwerk(String suche){
         ArrayList <String> ergebnis = new ArrayList<>();
         System.out.println("Suche nach Produktnetzwerk von " + suche + " ergab folgendes Ergebnis:");
         if(existPerson(Integer.parseInt(suche))==1) {
@@ -112,7 +113,7 @@ public class Datenbank {
         return ergebnis;
     }
 
-    public static ArrayList<String> firmennetzwerk(String suche){
+    public ArrayList<String> firmennetzwerk(String suche){
        ArrayList<String>ergebnis = new ArrayList<>();
         System.out.println("Suche nach Firmennetzwerk von " + suche + " ergab folgendes Ergebnis:");
         if(existPerson(Integer.parseInt(suche))==1) {
@@ -128,7 +129,7 @@ public class Datenbank {
         return ergebnis;
     }
 
-    public static void importFile(FileReader file) {
+    public void importFile(FileReader file) {
         String line = null;
         int returnCode = NEW_ENTITY_ERROR;
         try (BufferedReader br = new BufferedReader(file)) {
@@ -147,7 +148,7 @@ public class Datenbank {
     }
 
 
-    public static int getCode(String pLine) {
+    public int getCode(String pLine) {
         pLine = pLine.substring(pLine.indexOf(":") + 1);
         if (pLine.equals(" \"person_id\", \"person_name\", \"person_gender\"")) {
             return PERSONCODE;
@@ -167,7 +168,7 @@ public class Datenbank {
     }
 
 
-    public static void datenEintragen(int code, String pLine) {
+    public void datenEintragen(int code, String pLine) {
         String[] argumente;
         switch (code) {
             case NEW_ENTITY_ERROR:
@@ -210,7 +211,7 @@ public class Datenbank {
         }
     }
 
-    public static String[] argumenteVorbereiten(String pLine){
+    private String[] argumenteVorbereiten(String pLine){
         String[] argumente;
         argumente = pLine.split(",");
         argumente[0] = argumente[0].replaceAll("^\"+|\"+$", "");
@@ -226,15 +227,14 @@ public class Datenbank {
            Firmen in die firmenliste
            und Produkte in die Produktliste
         */
-    public static void addToList(ArrayList list, Object p) {
+    private void addToList(ArrayList list, Object p) {
         if (!list.contains(p)) {
             list.add(p);
         }
     }
 
 
-    public static void addFriend(int friend1, int friend2) {
-        int ergebniss=EXISTIERT_NICHT;
+    public void addFriend(int friend1, int friend2) {
         int index=0;
         if(existPerson(friend1)==1&&existPerson(friend2)==1) {
             for (Person p : personenListe) {
@@ -251,7 +251,7 @@ public class Datenbank {
     }
 
 
-    public static void addProdukt(int person, int produkt) {
+    public void addProdukt(int person, int produkt) {
         int index=0;
         if(existPerson(person)==EXISTIERT&&existProdukt(produkt)==EXISTIERT) {
             for (Produkt p : produktListe) {
@@ -268,7 +268,7 @@ public class Datenbank {
     }
 
 
-    public static void addProduktion(int produkt, int firma) {
+    private void addProduktion(int produkt, int firma) {
         int index=0;
         if(existProdukt(produkt)==EXISTIERT&&existFirma(firma)==EXISTIERT) {
             for (Produkt p : produktListe) {
@@ -288,7 +288,7 @@ public class Datenbank {
     Diese Methode iteriert durch alle Freundeslisten, der Personen die angelegt worden sind.
 
      */
-    public static void checkFreundschaft(){
+    public void checkFreundschaft(){
         for(Person p: personenListe){
             p.checkFreundschaft();
         }
@@ -297,7 +297,7 @@ public class Datenbank {
     Die Folgenden drei Methoden ueberpruefen, ob eine Person, Firma oder Produkt existiert.
     Rueckgabewert ist entweder EXISTIERT_NICHT oder OK
      */
-    public static int existPerson(int pPerson){
+    private int existPerson(int pPerson){
         int ergebniss=EXISTIERT_NICHT;
         for(Person x:personenListe){
             if(x.getiD()==pPerson){
@@ -306,7 +306,7 @@ public class Datenbank {
         }
         return ergebniss;
     }
-    public static int existFirma(int pFirma){
+    private int existFirma(int pFirma){
         int ergebniss=EXISTIERT_NICHT;
         for(Firma x:firmenListe){
             if(x.getId()==pFirma){
@@ -315,7 +315,7 @@ public class Datenbank {
         }
         return ergebniss;
     }
-    public static int existProdukt(int pProdukt){
+    private int existProdukt(int pProdukt){
         int ergebniss=EXISTIERT_NICHT;
         for(Produkt x:produktListe){
             if(x.getiD()==pProdukt){

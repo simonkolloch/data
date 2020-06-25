@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 
 public class Firma {
-    private int DOPPELT=95;
-    private int OK=100;
     int id;
     String name;
     public ArrayList<Produkt> produkte = new ArrayList<Produkt>();
@@ -25,5 +23,9 @@ public class Firma {
 
     public String getName() {
         return name;
+    }
+
+    public ArrayList<Produkt> getProdukte() {
+        return produkte;
     }
 }
